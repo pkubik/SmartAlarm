@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="enable_smart"
+        android:title="@string/pref_enable_smart_label" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="enable_notifications"
+        android:title="@string/pref_enable_notifications_label" />
+    <Preference
+        android:key="place_picker"
+        android:title="@string/pref_place_label"/>
+</PreferenceScreen>
