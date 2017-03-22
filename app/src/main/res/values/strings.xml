@@ -3,7 +3,10 @@
     <string name="pref_latitude_key" translatable="false">latitude</string>
     <string name="pref_longitude_key" translatable="false">longitude</string>
     <string name="pref_address_key" translatable="false">address</string>
+    <string name="pref_alarm_key" translatable="false">alarm</string>
     <string name="pref_place_label">Place</string>
+    <string name="pref_alarm_label">Next Alarm</string>
     <string name="pref_enable_smart_label">Alarm Clock Disabling</string>
     <string name="pref_enable_notifications_label">Enable Notifications</string>
+    <string name="update_button_label">Update</string>
 </resources>

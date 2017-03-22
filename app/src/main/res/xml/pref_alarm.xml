@@ -13,4 +13,7 @@
     <Preference
         android:key="place_picker"
         android:title="@string/pref_place_label"/>
+    <Preference
+        android:key="next_alarm"
+        android:title="@string/pref_alarm_label"/>
 </PreferenceScreen>

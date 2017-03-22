@@ -15,9 +15,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private String latitudeKey;
     private String longitudeKey;
     private String addressKey;
+    private String alarmKey;
     private MainActivity activity;
     private SharedPreferences sharedPreferences;
     private Preference placePref;
+    private Preference alarmPref;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -25,6 +27,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         latitudeKey = getString(R.string.pref_latitude_key);
         longitudeKey = getString(R.string.pref_longitude_key);
         addressKey = getString(R.string.pref_address_key);
+        alarmKey = getString(R.string.pref_alarm_key);
         activity = (MainActivity) getActivity();
         sharedPreferences = getPreferenceManager().getSharedPreferences();
 
@@ -40,6 +43,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 // handled by the same activity
                 activity.launchPlacePicker(latitude, longitude);
 
+                return true;
+            }
+        });
+
+        alarmPref = findPreference("next_alarm");
+        alarmPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                activity.scheduleTrafficJob();
                 return true;
             }
         });
@@ -59,5 +71,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         prefEditor.apply();
 
         placePref.setSummary(address);
+    }
+
+    public void setAlarmTime(long time) {
+        String timeString = Utils.msTimeToString(time);
+        Log.i(TAG, "setAlarmTime: Setting the affected alarm to " + timeString);
+        alarmPref.setSummary(timeString);
     }
 }
