@@ -14,6 +14,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val addressKey by lazy { getString(R.string.pref_address_key) }
     private val placePref by lazy { findPreference("place_picker") }
     private val alarmPref by lazy { findPreference("next_alarm") }
+    private var clickEnabled = true
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_alarm)
@@ -23,19 +24,25 @@ class SettingsFragment : PreferenceFragmentCompat() {
             if (sharedPreferences != null && placePref != null) {
                 placePref.summary = sharedPreferences.getString(addressKey, "")
                 placePref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    val latitude = sharedPreferences.getFloat(latitudeKey, 0.0f).toDouble()
-                    val longitude = sharedPreferences.getFloat(longitudeKey, 0.0f).toDouble()
+                    if (clickEnabled) {
+                        clickEnabled = false
 
-                    // Pass some id to this function to discriminate different preferences
-                    // handled by the same activity
-                    activity.launchPlacePicker(latitude, longitude)
+                        val latitude = sharedPreferences.getFloat(latitudeKey, 0.0f).toDouble()
+                        val longitude = sharedPreferences.getFloat(longitudeKey, 0.0f).toDouble()
+
+                        activity.launchPlacePicker(latitude, longitude)
+                    }
                     true
                 }
             }
 
             if (alarmPref != null) {
                 alarmPref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    activity.scheduleTrafficJob()
+                    if (clickEnabled) {
+                        clickEnabled = false
+
+                        activity.scheduleTrafficJob()
+                    }
                     true
                 }
             }
@@ -58,12 +65,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         placePref.summary = address
+
+        clickEnabled = true
     }
 
     fun setAlarmTime(time: Long) {
         val timeString = Utils.msTimeToString(time)
         Log.i(TAG, "setAlarmTime: Setting the affected alarm to " + timeString)
         alarmPref?.summary = timeString
+
+        clickEnabled = true
     }
 
     companion object {
