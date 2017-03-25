@@ -1,7 +1,6 @@
 package pl.pw.pkubik.smartalarm
 
 import android.app.Activity
-import android.app.AlarmManager
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
@@ -9,39 +8,38 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.ui.PlacePicker
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
+import org.jetbrains.anko.longToast
 
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var settingsFragment: SettingsFragment
-    private lateinit var alarmManager: AlarmManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         settingsFragment =
                 supportFragmentManager.findFragmentById(R.id.activity_settings) as SettingsFragment
-        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         scheduleTrafficJob()
     }
 
-    fun launchPlacePicker(latitude: Double, longitude: Double) {
-        Log.i(TAG, "Launching Place Picker intent.")
+    fun launchPlacePicker(id: Int, latitude: Double, longitude: Double) {
+        info("Launching Place Picker intent.")
         val intentBuilder = PlacePicker.IntentBuilder()
         val bounds = LatLngBounds.builder()
                 .include(LatLng(latitude, longitude))
                 .build()
         intentBuilder.setLatLngBounds(bounds)
         try {
-            startActivityForResult(intentBuilder.build(this), PLACE_PICKER_REQUEST)
+            startActivityForResult(intentBuilder.build(this), PLACE_PICKER_REQUEST + id)
         } catch (e: GooglePlayServicesRepairableException) {
             longToast("Can't connect Google Play Services.")
         } catch (e: GooglePlayServicesNotAvailableException) {
@@ -51,21 +49,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            Log.i(TAG, "onActivityResult: PLACE_PICKER_REQUEST")
+        if (requestCode >= PLACE_PICKER_REQUEST) {
+            info("onActivityResult: PLACE_PICKER_REQUEST")
             if (resultCode == Activity.RESULT_OK) {
                 val place = PlacePicker.getPlace(this, data)
-                settingsFragment.setPlace(place)
+                settingsFragment.setPlace(requestCode - PLACE_PICKER_REQUEST, place)
             } else {
-                Log.i(TAG, "onActivityResult: User did not pick a place.")
+                info("onActivityResult: User did not pick a place.")
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     fun scheduleTrafficJob() {
-        Log.i(TAG, "scheduleTrafficJob: Scheduling a job for the next alarm.")
-        val nextAlarm = alarmManager.nextAlarmClock
+        info("scheduleTrafficJob: Scheduling a job for the next alarm.")
+        val nextAlarm = Utils.getNextAlarm(this)
         if (nextAlarm != null) {
             val time = nextAlarm.triggerTime - TimeUnit.MINUTES.toMillis(5)
             val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
@@ -86,8 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val TAG = MainActivity::class.java.name
-        private val PLACE_PICKER_REQUEST = 1
+        private val PLACE_PICKER_REQUEST = 10
         private val TRAFFIC_JOB_ID = 1
     }
 }

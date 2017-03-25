@@ -3,20 +3,25 @@ package pl.pw.pkubik.smartalarm
 
 import android.app.job.JobParameters
 import android.app.job.JobService
-import android.util.Log
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.defaultSharedPreferences
+import org.jetbrains.anko.info
 
-class TrafficJobService : JobService() {
+
+class TrafficJobService : JobService(), AnkoLogger {
 
     override fun onStartJob(params: JobParameters): Boolean {
-        Log.i(TAG, "onStartJob: Starting the traffic job.")
+        val preferences = defaultSharedPreferences
+        val latitude = preferences.getFloat("latitude", 0.0f)
+        val longitude = preferences.getFloat("longitude", 0.0f)
+        info("onStartJob: Starting the traffic job for location (%f, %f)"
+                .format(latitude, longitude))
+        Utils.checkTraffic(this, latitude, longitude)
         return true
     }
 
     override fun onStopJob(params: JobParameters): Boolean {
+        info("onStartJob: Stopping the traffic job.")
         return false
-    }
-
-    companion object {
-        private val TAG = TrafficJobService::class.java.name
     }
 }
