@@ -25,7 +25,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAFqjRGfhTJU0AsahFD0VXDNwKrh6OPsdE"/>
-
         <service
             android:name=".TrafficJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"

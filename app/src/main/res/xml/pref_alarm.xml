@@ -11,8 +11,11 @@
         android:key="enable_notifications"
         android:title="@string/pref_enable_notifications_label" />
     <Preference
-        android:key="place_picker"
-        android:title="@string/pref_place_label"/>
+        android:key="place_picker0"
+        android:title="@string/pref_place_label0"/>
+    <Preference
+        android:key="place_picker1"
+        android:title="@string/pref_place_label1"/>
     <Preference
         android:key="next_alarm"
         android:title="@string/pref_alarm_label"/>
