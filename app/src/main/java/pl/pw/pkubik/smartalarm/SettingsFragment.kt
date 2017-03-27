@@ -9,39 +9,12 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 
 class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
-    inner class Checkpoint(val nr: Int) {
-        val mainKey = "place_picker" + nr.toString()
-        val latKey = getString(R.string.pref_latitude_key) + nr.toString()
-        val lngKey = getString(R.string.pref_longitude_key) + nr.toString()
-        val addressKey = getString(R.string.pref_address_key) + nr.toString()
-        val pref: Preference = findPreference(mainKey)
-        val lat: Double
-            get() {
-                return sharedPreferences.getFloat(latKey, 0.0f).toDouble()
-            }
-        val lng: Double
-            get() {
-                return sharedPreferences.getFloat(lngKey, 0.0f).toDouble()
-            }
-        val address: String
-            get() {
-                return sharedPreferences.getString(addressKey, "-")
-            }
-
-        fun update(lat: Double, lng: Double, address: String) {
-            sharedPreferences?.edit()?.apply {
-                putFloat(latKey, lat.toFloat())
-                putFloat(lngKey, lng.toFloat())
-                putString(addressKey, address)
-
-                apply()
-            }
-        }
-    }
-
     private val sharedPreferences by lazy { preferenceManager.sharedPreferences }
-    private val checkpoints by lazy { arrayOf(Checkpoint(0), Checkpoint(1)) }
+    private val checkpoints by lazy { arrayOf(Checkpoint(0, context), Checkpoint(1, context)) }
+    val checkpointPrefs by lazy {
+        arrayOf(findPreference("place_picker0"), findPreference("place_picker1")) }
     private val alarmPref by lazy { findPreference("next_alarm") }
+    private val trafficPref by lazy { findPreference("current_traffic") }
     private var clickEnabled = true
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -50,8 +23,9 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
         if (activity != null) {
             if (sharedPreferences != null) {
                 for (checkpoint in checkpoints) {
-                    checkpoint.pref.summary = checkpoint.address
-                    checkpoint.pref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    checkpointPrefs[checkpoint.nr].summary = checkpoint.address
+                    checkpointPrefs[checkpoint.nr].onPreferenceClickListener =
+                            Preference.OnPreferenceClickListener {
                         if (clickEnabled) {
                             clickEnabled = false
 
@@ -75,6 +49,42 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
                     true
                 }
             }
+
+            if (trafficPref != null) {
+                trafficPref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    if (clickEnabled) {
+                        clickEnabled = false
+
+                        Utils.checkTraffic(
+                                activity,
+                                checkpoints[0].latLng,
+                                checkpoints[1].latLng,
+                                object : Utils.TrafficResponseListener {
+                                    override fun onSuccess(time: Int, trafficTime: Int) {
+                                        clickEnabled = true
+                                        trafficPref.summary =
+                                                formatTrafficSummary(time, trafficTime)
+                                    }
+
+                                    override fun onFailure() {
+                                        clickEnabled = true
+                                    }
+                                })
+
+                    }
+                    true
+                }
+            }
+        }
+    }
+
+    fun formatTrafficSummary(time: Int, trafficTime: Int): String {
+        if (time == Int.MAX_VALUE) {
+            return ""
+        } else {
+            return "Usual time: %d min\nCurrent time: %d min".format(
+                    time / 60,
+                    trafficTime / 60)
         }
     }
 
@@ -83,10 +93,8 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
         val latLng = place.latLng
         val address = place.address.toString()
 
-        checkpoints[nr].apply {
-            update(latLng.latitude, latLng.longitude, address)
-            pref.summary = address
-        }
+        checkpoints[nr].update(latLng.latitude, latLng.longitude, address)
+        checkpointPrefs[nr].summary = address
 
         clickEnabled = true
     }
