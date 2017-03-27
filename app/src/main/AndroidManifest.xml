@@ -24,7 +24,7 @@
             android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAFqjRGfhTJU0AsahFD0VXDNwKrh6OPsdE"/>
+            android:value="@string/maps_api_key"/>
         <service
             android:name=".TrafficJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"

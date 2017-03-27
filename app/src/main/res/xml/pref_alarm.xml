@@ -19,4 +19,7 @@
     <Preference
         android:key="next_alarm"
         android:title="@string/pref_alarm_label"/>
+    <Preference
+        android:key="current_traffic"
+        android:title="@string/pref_current_traffic"/>
 </PreferenceScreen>

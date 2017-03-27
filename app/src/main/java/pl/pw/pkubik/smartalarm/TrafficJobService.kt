@@ -12,11 +12,13 @@ class TrafficJobService : JobService(), AnkoLogger {
 
     override fun onStartJob(params: JobParameters): Boolean {
         val preferences = defaultSharedPreferences
-        val latitude = preferences.getFloat("latitude", 0.0f)
-        val longitude = preferences.getFloat("longitude", 0.0f)
-        info("onStartJob: Starting the traffic job for location (%f, %f)"
-                .format(latitude, longitude))
-        Utils.checkTraffic(this, latitude, longitude)
+//        val lat0 = preferences.getFloat("latitude0", 0.0f)
+//        val lng0 = preferences.getFloat("longitude0", 0.0f)
+//        val lat0 = preferences.getFloat("latitude0", 0.0f)
+//        val lng0 = preferences.getFloat("longitude0", 0.0f)
+//        info("onStartJob: Starting the traffic job for location (%f, %f)"
+//                .format(latitude, longitude))
+//        Utils.checkTraffic(this, latitude, longitude)
         return true
     }
 

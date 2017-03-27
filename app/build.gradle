@@ -18,6 +18,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        buildTypes.each {
+            it.buildConfigField 'String', 'web_api_key', WebApiKey
+            it.resValue 'string', 'maps_api_key', MapsApiKey
+        }
     }
 }
 
@@ -34,6 +38,7 @@ dependencies {
     compile 'org.jetbrains.anko:anko-sdk23:0.9.1'
     compile 'org.jetbrains.anko:anko-common:0.9.1'
     compile 'org.jetbrains.anko:anko-appcompat-v7:0.9.1'
+    compile 'com.beust:klaxon:0.30'
 }
 repositories {
     mavenCentral()
