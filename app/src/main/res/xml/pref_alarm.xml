@@ -5,10 +5,6 @@
     <PreferenceCategory android:title="Settings">
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="enable_smart"
-            android:title="@string/pref_enable_smart_label" />
-        <CheckBoxPreference
-            android:defaultValue="false"
             android:key="enable_notifications"
             android:title="@string/pref_enable_notifications_label" />
         <Preference
@@ -33,6 +29,7 @@
         <Preference
             android:key="current_traffic"
             android:title="@string/pref_current_traffic"
+            android:summary="(tap to refresh)"
             android:icon="@drawable/ic_menu_refresh"/>
     </PreferenceCategory>
 </PreferenceScreen>
