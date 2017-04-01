@@ -1,23 +1,24 @@
 package pl.pw.pkubik.smartalarm
 
 import android.os.Bundle
-import android.support.v7.preference.Preference
-import android.support.v7.preference.PreferenceFragmentCompat
+import android.preference.PreferenceFragment
+import android.preference.Preference
 
 import com.google.android.gms.location.places.Place
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 
-class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
+class SettingsFragment : PreferenceFragment(), AnkoLogger {
     private val sharedPreferences by lazy { preferenceManager.sharedPreferences }
     private val checkpoints by lazy { arrayOf(Checkpoint(0, context), Checkpoint(1, context)) }
     val checkpointPrefs by lazy {
         arrayOf(findPreference("place_picker0"), findPreference("place_picker1")) }
-    private val alarmPref by lazy { findPreference("next_alarm") }
+    private val timePref by lazy { findPreference("alarm_time") }
     private val trafficPref by lazy { findPreference("current_traffic") }
     private var clickEnabled = true
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         addPreferencesFromResource(R.xml.pref_alarm)
         val activity = activity as MainActivity?
         if (activity != null) {
@@ -39,15 +40,11 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
                 }
             }
 
-            if (alarmPref != null) {
-                alarmPref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    if (clickEnabled) {
-                        clickEnabled = false
-
-                        activity.scheduleTrafficJob()
-                    }
-                    true
+            if (timePref != null) {
+                timePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {
+                    _, newValue -> activity.scheduleTrafficJob(newValue as? Long); true
                 }
+
             }
 
             if (trafficPref != null) {
@@ -70,8 +67,6 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
                                         clickEnabled = true
                                     }
                                 })
-                        // TODO: remove
-                        Utils.notifyAboutTraffic(context, 1.2345678f)
                     }
                     true
                 }
@@ -81,7 +76,7 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
 
     fun formatTrafficSummary(time: Int, trafficTime: Int): String {
         if (time == Int.MAX_VALUE) {
-            return ""
+            return trafficPref.summary.toString()
         } else {
             return "Usual time: %d min\nCurrent time: %d min".format(
                     time / 60,
@@ -96,14 +91,6 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
 
         checkpoints[nr].update(latLng.latitude, latLng.longitude, address)
         checkpointPrefs[nr].summary = address
-
-        clickEnabled = true
-    }
-
-    fun setAlarmTime(time: Long) {
-        val timeString = Utils.msTimeToString(time)
-        info("setAlarmTime: Setting the affected alarm to " + timeString)
-        alarmPref?.summary = timeString
 
         clickEnabled = true
     }
