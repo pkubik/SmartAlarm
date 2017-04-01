@@ -70,7 +70,8 @@ class SettingsFragment : PreferenceFragmentCompat(), AnkoLogger {
                                         clickEnabled = true
                                     }
                                 })
-
+                        // TODO: remove
+                        Utils.notifyAboutTraffic(context, 1.2345678f)
                     }
                     true
                 }

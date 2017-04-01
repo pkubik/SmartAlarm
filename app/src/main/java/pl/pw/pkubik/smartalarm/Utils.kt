@@ -2,8 +2,10 @@ package pl.pw.pkubik.smartalarm
 
 
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.content.Context
 import android.net.Uri
+import android.support.v7.app.NotificationCompat
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
@@ -14,6 +16,7 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.Context.NOTIFICATION_SERVICE
 
 
 object Utils : AnkoLogger {
@@ -33,8 +36,17 @@ object Utils : AnkoLogger {
         return alarmManager.nextAlarmClock
     }
 
-    fun notifyOnNextAlarm(context: Context) {
-        info("Created notification on the next alarm.")
+    fun notifyAboutTraffic(context: Context, ratio: Float) {
+        val notificationBuilder = NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.perm_group_system_clock)
+                .setContentTitle("Traffic problems detected!")
+                .setContentText("Delay ratio: %.2f".format(ratio))
+
+        val notificationManager =
+                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0, notificationBuilder.build())
+
+        info("Created notification about traffic.")
     }
 
     fun buildTrafficUrl(origin: LatLng, destination: LatLng): URL? {
