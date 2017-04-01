@@ -3,6 +3,9 @@ package pl.pw.pkubik.smartalarm
 
 import android.app.AlarmManager
 import android.app.NotificationManager
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
 import android.support.v7.app.NotificationCompat
@@ -11,25 +14,17 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.google.android.gms.maps.model.LatLng
 import org.jetbrains.anko.*
-import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.*
 import android.content.Context.NOTIFICATION_SERVICE
+import java.util.*
+import javax.net.ssl.HttpsURLConnection
 
 
 object Utils : AnkoLogger {
     const val GOOGLE_API_KEY = BuildConfig.web_api_key
     const val GOOGLE_BASE_URL = "https://maps.googleapis.com/maps/api/directions/json"
-
-    fun msTimeToString(msTime: Long): String {
-        if (msTime == 0L) {
-            return "-"
-        }
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US)
-        return dateFormat.format(Date(msTime))
-    }
+    const val TRAFFIC_JOB_ID = 1
 
     fun getNextAlarm(context: Context): AlarmManager.AlarmClockInfo? {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -51,9 +46,10 @@ object Utils : AnkoLogger {
 
     fun buildTrafficUrl(origin: LatLng, destination: LatLng): URL? {
         val uri = Uri.parse(GOOGLE_BASE_URL).buildUpon()
-                .appendQueryParameter("origin", "%f,%f".format(origin.latitude, origin.longitude))
+                .appendQueryParameter("origin",
+                        "%.10f,%.10f".format(Locale.US, origin.latitude, origin.longitude))
                 .appendQueryParameter("destination",
-                        "%f,%f".format(destination.latitude, destination.longitude))
+                        "%.10f,%.10f".format(Locale.US, destination.latitude, destination.longitude))
                 .appendQueryParameter("key", GOOGLE_API_KEY)
                 .appendQueryParameter("departure_time", "now")
                 .appendQueryParameter("traffic_model", "best_guess")
@@ -84,15 +80,20 @@ object Utils : AnkoLogger {
                 uiThread { responseListener.onFailure() }
             } else {
                 try {
-                    val connection = url.openConnection() as HttpURLConnection
+                    val connection = url.openConnection() as HttpsURLConnection
                     connection.connect()
                     if (connection.responseCode == 200) {
                         info("Received traffic response")
                         val json = Parser().parse(connection.inputStream) as JsonObject
                         val (time, trafficTime) = extractTimes(json)
 
-                        uiThread {
-                            responseListener.onSuccess(time, trafficTime)
+                        if (time == Int.MAX_VALUE) {
+                            info("Route not found")
+                            uiThread { responseListener.onFailure() }
+                        } else {
+                            uiThread {
+                                responseListener.onSuccess(time, trafficTime)
+                            }
                         }
                     } else {
                         error("Failed to query the traffic server")
@@ -132,5 +133,25 @@ object Utils : AnkoLogger {
         }
 
         return Pair(time, trafficTime)
+    }
+
+    fun scheduleTrafficJob(context: Context, time: Long) {
+        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+
+        // Cancel the previous job
+        scheduler.cancel(TRAFFIC_JOB_ID)
+
+        val timeDiff = time - System.currentTimeMillis()
+        val jobInfo = JobInfo.Builder(
+                TRAFFIC_JOB_ID, ComponentName(context, TrafficJobService::class.java))
+                .setMinimumLatency(timeDiff)
+                .build()
+        scheduler.schedule(jobInfo)
+    }
+
+    fun runAlarm(context: Context) {
+        info("Running the alarm")
+        warn("NOT IMPLEMENTED")
+        // TODO: IMPLEMENT
     }
 }

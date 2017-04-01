@@ -11,18 +11,36 @@ import org.jetbrains.anko.info
 class TrafficJobService : JobService(), AnkoLogger {
 
     override fun onStartJob(params: JobParameters): Boolean {
-        val preferences = defaultSharedPreferences
-//        val lat0 = preferences.getFloat("latitude0", 0.0f)
-//        val lng0 = preferences.getFloat("longitude0", 0.0f)
-//        val lat0 = preferences.getFloat("latitude0", 0.0f)
-//        val lng0 = preferences.getFloat("longitude0", 0.0f)
-//        info("onStartJob: Starting the traffic job for location (%f, %f)"
-//                .format(latitude, longitude))
-//        Utils.checkTraffic(this, latitude, longitude)
+        val checkpoints = arrayOf(Checkpoint(0, this), Checkpoint(1, this))
+        val stringThreshold = defaultSharedPreferences.getString("delay_ratio", "200")
+        val threshold = stringThreshold?.toFloat()?.div(100)
+        Utils.checkTraffic(
+                this,
+                checkpoints[0].latLng,
+                checkpoints[1].latLng,
+                object : Utils.TrafficResponseListener {
+                    override fun onSuccess(time: Int, trafficTime: Int) {
+                        val ratio = trafficTime.toFloat() / time.toFloat()
+                        Utils.notifyAboutTraffic(this@TrafficJobService, ratio)
+
+                        if (threshold != null && ratio < threshold) {
+                            Utils.runAlarm(this@TrafficJobService)
+                        } else {
+                            info("Delay ratio met the threshold - dismissing the alarm")
+                        }
+
+                        jobFinished(params, false)
+                    }
+
+                    override fun onFailure() {
+                        Utils.runAlarm(this@TrafficJobService)
+                        jobFinished(params, false)
+                    }
+                })
         return true
     }
 
-    override fun onStopJob(params: JobParameters): Boolean {
+    override fun onStopJob(params: JobParameters?): Boolean {
         info("onStartJob: Stopping the traffic job.")
         return false
     }
