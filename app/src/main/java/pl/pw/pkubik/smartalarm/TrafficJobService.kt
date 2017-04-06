@@ -14,6 +14,7 @@ class TrafficJobService : JobService(), AnkoLogger {
         val checkpoints = arrayOf(Checkpoint(0, this), Checkpoint(1, this))
         val stringThreshold = defaultSharedPreferences.getString("delay_ratio", "200")
         val threshold = stringThreshold?.toFloat()?.div(100)
+
         Utils.checkTraffic(
                 this,
                 checkpoints[0].latLng,
@@ -24,7 +25,9 @@ class TrafficJobService : JobService(), AnkoLogger {
                         Utils.notifyAboutTraffic(this@TrafficJobService, ratio)
 
                         if (threshold != null && ratio < threshold) {
-                            Utils.runAlarm(this@TrafficJobService)
+                            if (!defaultSharedPreferences.getBoolean("notification_only", false)) {
+                                Utils.runAlarm(this@TrafficJobService)
+                            }
                         } else {
                             info("Delay ratio met the threshold - dismissing the alarm")
                         }
@@ -33,7 +36,9 @@ class TrafficJobService : JobService(), AnkoLogger {
                     }
 
                     override fun onFailure() {
-                        Utils.runAlarm(this@TrafficJobService)
+                        if (!defaultSharedPreferences.getBoolean("notification_only", false)) {
+                            Utils.runAlarm(this@TrafficJobService)
+                        }
                         jobFinished(params, false)
                     }
                 })

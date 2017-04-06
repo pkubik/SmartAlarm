@@ -81,6 +81,7 @@ class TimePreference @JvmOverloads constructor(
     }
 
     override fun getSummary(): CharSequence? {
-        return DateFormat.getTimeFormat(context).format(Date(calendar.timeInMillis))
+        return DateFormat.getDateFormat(context).format(Date(calendar.timeInMillis)) +
+                " " + DateFormat.getTimeFormat(context).format(Date(calendar.timeInMillis))
     }
 }
