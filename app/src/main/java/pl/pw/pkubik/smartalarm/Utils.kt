@@ -19,6 +19,7 @@ import java.net.URL
 import android.content.Context.NOTIFICATION_SERVICE
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
+import android.media.RingtoneManager
 
 
 object Utils : AnkoLogger {
@@ -151,7 +152,8 @@ object Utils : AnkoLogger {
 
     fun runAlarm(context: Context) {
         info("Running the alarm")
-        warn("NOT IMPLEMENTED")
-        // TODO: IMPLEMENT
+        val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        val ringtone = RingtoneManager.getRingtone(context, notification)
+        ringtone.play()
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_delay_ratio_option_labels">
-        <item>0% (always true)</item>
+        <item>0% (always dismiss)</item>
         <item>100%</item>
         <item>120%</item>
         <item>150%</item>
