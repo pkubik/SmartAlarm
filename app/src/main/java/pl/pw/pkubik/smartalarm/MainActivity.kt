@@ -61,7 +61,6 @@ class MainActivity : Activity(), AnkoLogger {
         }
 
         if (time != null) {
-            // TODO: Check current time and add 24h if it's bigger than provided
             Utils.scheduleTrafficJob(this, time)
         } else {
             error("Received null as the time")

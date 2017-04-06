@@ -8,6 +8,7 @@ import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.view.View
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class TimePreference @JvmOverloads constructor(
@@ -38,10 +39,17 @@ class TimePreference @JvmOverloads constructor(
         super.onDialogClosed(positiveResult)
 
         if (positiveResult) {
+            val currentTime = System.currentTimeMillis()
+            calendar.timeInMillis = currentTime
             calendar.set(Calendar.HOUR_OF_DAY, picker!!.hour)
             calendar.set(Calendar.MINUTE, picker!!.minute)
 
+            if (calendar.timeInMillis < currentTime) {
+                calendar.timeInMillis += TimeUnit.DAYS.toMillis(1)
+            }
+
             setSummary(summary)
+
             if (callChangeListener(calendar.timeInMillis)) {
                 persistLong(calendar.timeInMillis)
                 notifyChanged()
