@@ -3,6 +3,8 @@ package pl.pw.pkubik.smartalarm
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -13,6 +15,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.longToast
 
+
 class MainActivity : Activity(), AnkoLogger {
     private lateinit var settingsFragment: SettingsFragment
 
@@ -21,6 +24,11 @@ class MainActivity : Activity(), AnkoLogger {
         setContentView(R.layout.activity_main)
         settingsFragment =
                 fragmentManager.findFragmentById(R.id.activity_settings) as SettingsFragment
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return true
     }
 
     fun launchPlacePicker(id: Int, latitude: Double, longitude: Double) {
@@ -65,6 +73,16 @@ class MainActivity : Activity(), AnkoLogger {
         } else {
             error("Received null as the time")
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val id = item.itemId
+        if (id == R.id.preview_option) {
+            Utils.runAlarm(this)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

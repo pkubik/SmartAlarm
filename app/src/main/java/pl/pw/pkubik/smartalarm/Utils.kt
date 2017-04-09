@@ -20,6 +20,11 @@ import android.content.Context.NOTIFICATION_SERVICE
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
 import android.media.RingtoneManager
+import android.content.Context.WINDOW_SERVICE
+import android.content.Intent
+import android.view.WindowManager
+
+
 
 
 object Utils : AnkoLogger {
@@ -152,8 +157,7 @@ object Utils : AnkoLogger {
 
     fun runAlarm(context: Context) {
         info("Running the alarm")
-        val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        val ringtone = RingtoneManager.getRingtone(context, notification)
-        ringtone.play()
+        val intent = Intent(context, AlarmActivity::class.java)
+        context.startActivity(intent)
     }
 }
