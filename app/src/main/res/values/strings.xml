@@ -9,7 +9,7 @@
     <string name="pref_alarm_time_label">Alarm Time</string>
     <string name="pref_delay_ratio">Delay Ratio Threshold</string>
     <string name="pref_current_traffic">Current Traffic</string>
-    <string name="pref_enable_notifications_label">Notification Only Mode</string>
+    <string name="pref_auto_dismiss_label">Auto-Dismiss Mode</string>
 
     <string name="title_activity_alarm">Smart Alarm</string>
     <string name="dismiss_alarm_button">Dismiss</string>

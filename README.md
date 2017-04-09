@@ -9,17 +9,24 @@ clock to allow the user to sleep in until the difficulties are over. Note
 that not everyone can afford such behaviour!
 
 
+Usage
+-----
+
+User must specified following options:
+- Auto Dismiss Mode - whether to automatically dismiss the alarm
+- Delay Ratio Threshold - typical / current travel time ratio, when it's exceeded
+and the auto-dismiss mode is on, the alarm is dismissed
+- Initial and Final checkpoints - a segment to monitor, if there are many paths
+which allow to reach the final checkpoint from the initial checkpoint the
+shortest are being considered
+- Alarm Time - time of the alarm
+
 How does it work?
 -----------------
 
-An associated with the application service is launched everyday at 3:00 AM
-in order to schedule a job to be performed just before the next alarm clock.
-The job consists of checking the traffic at the specified area to decide
-whether to affect the alarm clock (by disabling it or by adding the notification
-about the traffic).
+The application is launching a service at specified Alarm Time. The service
+queries the Google Traffic API in order to measure delays on the roads connecting
+the specified checkpoints. The results are always shown in a notification.
+Additionally the alarm clock is launched if the delay has not exceeded the threshold
+or the Auto Dismiss Mode is turned off.
 
-The behaviour executed by the service at the specified time can be also executed
-from within the user interface.
-
-Note that if multiple alarm clocks are set, only the first one is going to
-be affected.

@@ -5,8 +5,8 @@
     <PreferenceCategory android:title="Settings">
         <SwitchPreference
             android:defaultValue="false"
-            android:key="notification_only"
-            android:title="@string/pref_enable_notifications_label" />
+            android:key="auto_dismiss"
+            android:title="@string/pref_auto_dismiss_label" />
         <Preference
             android:key="place_picker0"
             android:title="@string/pref_place_label0"/>

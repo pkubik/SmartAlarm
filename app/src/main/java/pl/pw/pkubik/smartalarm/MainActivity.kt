@@ -31,6 +31,16 @@ class MainActivity : Activity(), AnkoLogger {
         return true
     }
 
+    override fun onResume() {
+        isRunning = true
+        super.onResume()
+    }
+
+    override fun onPause() {
+        isRunning = false
+        super.onDestroy()
+    }
+
     fun launchPlacePicker(id: Int, latitude: Double, longitude: Double) {
         info("Launching Place Picker intent.")
         val intentBuilder = PlacePicker.IntentBuilder()
@@ -87,5 +97,6 @@ class MainActivity : Activity(), AnkoLogger {
 
     companion object {
         private val PLACE_PICKER_REQUEST = 10
+        var isRunning = false
     }
 }

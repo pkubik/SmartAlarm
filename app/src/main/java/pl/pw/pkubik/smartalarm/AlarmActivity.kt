@@ -14,7 +14,7 @@ import android.view.*
  */
 class AlarmActivity : Activity() {
     private var mContentView: View? = null
-    private lateinit var ringtone: Ringtone
+    private lateinit var mRingtone: Ringtone
     private var mControlsView: View? = null
 
     /**
@@ -22,8 +22,8 @@ class AlarmActivity : Activity() {
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-    private val mDelayHideTouchListener = View.OnTouchListener { view, motionEvent ->
-        ringtone.stop()
+    private val dismissButtonListener = View.OnTouchListener { view, motionEvent ->
+        mRingtone.stop()
         finish()
         false
     }
@@ -39,7 +39,7 @@ class AlarmActivity : Activity() {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dismiss_button).setOnTouchListener(mDelayHideTouchListener)
+        findViewById(R.id.dismiss_button).setOnTouchListener(dismissButtonListener)
 
         val window = window
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
@@ -48,7 +48,16 @@ class AlarmActivity : Activity() {
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
 
         val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        ringtone = RingtoneManager.getRingtone(this, notification)
-        ringtone.play()
+        mRingtone = RingtoneManager.getRingtone(this, notification)
+        if (!mRingtone.isPlaying) {
+            mRingtone.play()
+        }
+    }
+
+    override fun onDestroy() {
+        if (mRingtone.isPlaying) {
+            mRingtone.stop()
+        }
+        super.onDestroy()
     }
 }

@@ -158,6 +158,8 @@ object Utils : AnkoLogger {
     fun runAlarm(context: Context) {
         info("Running the alarm")
         val intent = Intent(context, AlarmActivity::class.java)
+        if (!MainActivity.isRunning)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         context.startActivity(intent)
     }
 }
