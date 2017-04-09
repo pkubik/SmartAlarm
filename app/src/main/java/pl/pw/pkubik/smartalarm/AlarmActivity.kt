@@ -1,11 +1,9 @@
 package pl.pw.pkubik.smartalarm
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 
 /**

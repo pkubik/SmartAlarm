@@ -65,10 +65,25 @@ class SettingsFragment : PreferenceFragment(), AnkoLogger {
 
                                     override fun onFailure() {
                                         clickEnabled = true
+                                        trafficPref.summary = "(network error)"
                                     }
                                 })
                     }
                     true
+                }
+            }
+
+            val enableAllPref = findPreference("enable_all")
+            if (enableAllPref != null) {
+                enableAllPref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {
+                    _, newValue -> when (newValue) {
+                    false -> { Utils.cancelTrafficJob(activity); true }
+                    else -> {
+                        val time = sharedPreferences.getLong("alarm_time", 0)
+                        Utils.scheduleTrafficJob(activity, time)
+                        true
+                    }
+                }
                 }
             }
         }
