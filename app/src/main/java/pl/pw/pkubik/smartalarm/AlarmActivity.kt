@@ -2,6 +2,7 @@ package pl.pw.pkubik.smartalarm
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.os.Handler
@@ -14,6 +15,7 @@ import android.view.*
 class AlarmActivity : Activity() {
     private val mHideHandler = Handler()
     private var mContentView: View? = null
+    private lateinit var ringtone: Ringtone
     private val mHidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar
 
@@ -36,6 +38,7 @@ class AlarmActivity : Activity() {
     }
     private var mVisible: Boolean = false
     private val mHideRunnable = Runnable { hide() }
+
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
@@ -45,6 +48,8 @@ class AlarmActivity : Activity() {
         if (AUTO_HIDE) {
             delayedHide(AUTO_HIDE_DELAY_MILLIS)
         }
+        ringtone.stop()
+        finish()
         false
     }
 
@@ -64,7 +69,7 @@ class AlarmActivity : Activity() {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener)
+        findViewById(R.id.dismiss_button).setOnTouchListener(mDelayHideTouchListener)
 
         val window = window
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
@@ -73,7 +78,7 @@ class AlarmActivity : Activity() {
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
 
         val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        val ringtone = RingtoneManager.getRingtone(this, notification)
+        ringtone = RingtoneManager.getRingtone(this, notification)
         ringtone.play()
     }
 
