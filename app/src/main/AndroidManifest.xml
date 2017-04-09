@@ -43,7 +43,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_alarm"
             android:theme="@style/FullscreenTheme"
-            android:showOnLockScreen="true" />
+            android:showOnLockScreen="true"
+            android:launchMode="singleTask" />
     </application>
 
 </manifest>

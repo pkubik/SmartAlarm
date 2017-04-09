@@ -6,6 +6,8 @@ import android.app.job.JobService
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.info
+import org.jetbrains.anko.warn
+import org.jetbrains.anko.error
 
 
 class TrafficJobService : JobService(), AnkoLogger {
@@ -24,21 +26,25 @@ class TrafficJobService : JobService(), AnkoLogger {
                         val ratio = trafficTime.toFloat() / time.toFloat()
                         Utils.notifyAboutTraffic(this@TrafficJobService, ratio)
 
-                        if (threshold != null && ratio < threshold) {
-                            if (!defaultSharedPreferences.getBoolean("notification_only", false)) {
+                        if (threshold != null) {
+                            if (ratio > threshold &&
+                                    defaultSharedPreferences.getBoolean("auto_dismiss", false)) {
+                                info("Threshold met - suppressing the alarm.")
+                            } else {
+                                // All fine
                                 Utils.runAlarm(this@TrafficJobService)
                             }
                         } else {
-                            info("Delay ratio met the threshold - dismissing the alarm")
+                            warn("Threshold not set - launching the alarm.")
+                            Utils.runAlarm(this@TrafficJobService)
                         }
 
                         jobFinished(params, false)
                     }
 
                     override fun onFailure() {
-                        if (!defaultSharedPreferences.getBoolean("notification_only", false)) {
-                            Utils.runAlarm(this@TrafficJobService)
-                        }
+                        error("Failed to retrieve traffic info.")
+                        Utils.runAlarm(this@TrafficJobService)
                         jobFinished(params, false)
                     }
                 })
