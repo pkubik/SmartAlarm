@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SmartAlarm</string>
+    <string name="pref_enable_all_label">Enable SmartAlarm</string>
     <string name="pref_latitude_key" translatable="false">latitude</string>
     <string name="pref_longitude_key" translatable="false">longitude</string>
     <string name="pref_address_key" translatable="false">address</string>

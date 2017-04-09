@@ -19,12 +19,8 @@ import java.net.URL
 import android.content.Context.NOTIFICATION_SERVICE
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
-import android.media.RingtoneManager
-import android.content.Context.WINDOW_SERVICE
 import android.content.Intent
-import android.view.WindowManager
-
-
+import java.util.concurrent.TimeUnit
 
 
 object Utils : AnkoLogger {
@@ -106,6 +102,7 @@ object Utils : AnkoLogger {
                         uiThread { responseListener.onFailure() }
                     }
                 } catch (e: Exception) {
+                    error("Failed to query the traffic server")
                     e.printStackTrace()
                     uiThread { responseListener.onFailure() }
                 }
@@ -148,11 +145,18 @@ object Utils : AnkoLogger {
         scheduler.cancel(TRAFFIC_JOB_ID)
 
         val timeDiff = time - System.currentTimeMillis()
-        val jobInfo = JobInfo.Builder(
-                TRAFFIC_JOB_ID, ComponentName(context, TrafficJobService::class.java))
-                .setMinimumLatency(timeDiff)
-                .build()
-        scheduler.schedule(jobInfo)
+        if (timeDiff > TimeUnit.SECONDS.toMillis(30)) {
+            val jobInfo = JobInfo.Builder(
+                    TRAFFIC_JOB_ID, ComponentName(context, TrafficJobService::class.java))
+                    .setMinimumLatency(timeDiff)
+                    .build()
+            scheduler.schedule(jobInfo)
+        }
+    }
+
+    fun cancelTrafficJob(context: Context) {
+        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        scheduler.cancel(TRAFFIC_JOB_ID)
     }
 
     fun runAlarm(context: Context) {

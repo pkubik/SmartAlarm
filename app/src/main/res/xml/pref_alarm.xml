@@ -5,15 +5,23 @@
     <PreferenceCategory android:title="Settings">
         <SwitchPreference
             android:defaultValue="false"
+            android:key="enable_all"
+            android:title="@string/pref_enable_all_label" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="enable_all"
             android:key="auto_dismiss"
             android:title="@string/pref_auto_dismiss_label" />
         <Preference
             android:key="place_picker0"
+            android:dependency="enable_all"
             android:title="@string/pref_place_label0"/>
         <Preference
+            android:dependency="enable_all"
             android:key="place_picker1"
             android:title="@string/pref_place_label1"/>
         <ListPreference
+            android:dependency="enable_all"
             android:key="delay_ratio"
             android:title="@string/pref_delay_ratio"
             android:entries="@array/pref_delay_ratio_option_labels"
@@ -22,6 +30,7 @@
             android:defaultValue="150"/>
         <pl.pw.pkubik.smartalarm.TimePreference
             android:key="alarm_time"
+            android:dependency="enable_all"
             android:title="@string/pref_alarm_time_label"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Status">
