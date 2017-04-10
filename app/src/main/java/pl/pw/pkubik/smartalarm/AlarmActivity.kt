@@ -1,6 +1,8 @@
 package pl.pw.pkubik.smartalarm
 
 import android.app.Activity
+import android.media.AudioAttributes
+import android.media.AudioAttributes.USAGE_ALARM
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Bundle
@@ -47,6 +49,9 @@ class AlarmActivity : Activity() {
 
         val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         mRingtone = RingtoneManager.getRingtone(this, notification)
+        mRingtone.audioAttributes = AudioAttributes.Builder()
+                .setUsage(USAGE_ALARM)
+                .build()
         if (!mRingtone.isPlaying) {
             mRingtone.play()
         }

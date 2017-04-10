@@ -58,7 +58,7 @@ class MainActivity : Activity(), AnkoLogger {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode >= PLACE_PICKER_REQUEST) {
             info("onActivityResult: PLACE_PICKER_REQUEST")
             if (resultCode == Activity.RESULT_OK) {
